@@ -36,7 +36,7 @@ const userSchema = new Schema(
       index: true,
     },
 
-    avtar: {
+    avatar: {
       type: String, // cloudinary url
       require: true,
     },
@@ -47,8 +47,7 @@ const userSchema = new Schema(
 
     password: {
       type: String,
-      require: [true, " Password is required"],
-      unique: true,
+      require: [true, " Password is required"]
     },
 
     refreshToken: {
@@ -56,7 +55,7 @@ const userSchema = new Schema(
     },
   },
   { timestamps: true }
-);
+)
 
 
 ///encrypt password before saving in database
@@ -64,14 +63,18 @@ const userSchema = new Schema(
 userSchema.pre("save", async function (next) {
     if(!this.isModified("password")) return next()
 
-    this.password = bcrypt.hash(this.password, 10)
+    this.password = await bcrypt.hash(this.password, 10)
+    console.log(this.password);
     next()
 })
 
 // chack password is correct or not and return true or false 
-userSchema.methods.isPassword = async function (password){
+userSchema.methods.isPasswordCorrect = async function (password){
      return await bcrypt.compare(password, this.password)
+     
 }
+
+//Token
 
 userSchema.method.generateAccessToken = function () {
   jwt.sign(
